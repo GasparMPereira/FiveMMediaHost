@@ -2,6 +2,7 @@
 Image hosting for FiveM servers
 
 # Example of usage with screenshot-basic
+```
 exports['screenshot-basic']:requestScreenshotUpload(Config.ImageUploadURL, 'image', {['encoding'] = 'webp'}, function(img)
   if(img)then
   local json = json.decode(img)
@@ -10,3 +11,4 @@ exports['screenshot-basic']:requestScreenshotUpload(Config.ImageUploadURL, 'imag
     found:resolve(nil)
   end
 end)
+```
