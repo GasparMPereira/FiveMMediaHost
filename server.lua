@@ -1,5 +1,4 @@
 --print(GetResourcePath(GetCurrentResourceName()))
---local imageDirectory = "resources/"..GetCurrentResourceName().."/images/"
 local imageDirectory = "resources/[phone]/"..GetCurrentResourceName().."/images/"
 
 local function fileExists(path)
@@ -66,7 +65,7 @@ SetHttpHandler(function(request, response)
                 imageFile:write(image_data)
                 imageFile:close()
                     
-                local url = "http://"..Config.ServerHost..":30120/"..GetCurrentResourceName().."/images/" .. imageName
+                local url = Config.ServerHost.."/images/" .. imageName
                 response.writeHead(200, { ['Content-Type'] = 'application/json' })
                 response.send(json.encode({ id = imageID, attachments = {{proxy_url = url}}, url = url }))
             else
