@@ -52,23 +52,21 @@ SetHttpHandler(function(request, response)
 
                 local start_index, end_index = string.find(body, boundary, 1, true)
                 if not start_index or not end_index then
-                    print("Delimitador de início/fim não encontrado.")
                     return false
                 end
                 -- Encontra o início do corpo da imagem
                 local image_start_index = string.find(body, "\r\n\r\n", end_index + 1, true)
                 if not image_start_index then
-                    print("Corpo da imagem não encontrado.")
                     return false
                 end
-                -- Escreve o corpo da imagem em um arquivo
+                -- Escreve o corpo da imagem num arquivo
                 local image_data = string.sub(body, image_start_index + 4)
 
                 local imageFile = io.open(imagePath, 'wb')
                 imageFile:write(image_data)
                 imageFile:close()
                     
-                local url = "http://yourserverip:30120/lhdc_imageHost/images/" .. imageName
+                local url = "http://"..Config.ServerHost..":30120/"..GetCurrentResourceName().."/images/" .. imageName
                 response.writeHead(200, { ['Content-Type'] = 'application/json' })
                 response.send(json.encode({ id = imageID, attachments = {{proxy_url = url}}, url = url }))
             else
