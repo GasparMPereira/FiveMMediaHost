@@ -1,5 +1,14 @@
 --print(GetResourcePath(GetCurrentResourceName()))
-local imageDirectory = "resources/[phone]/"..GetCurrentResourceName().."/images/"
+
+RegisterServerEvent('fivemimagehost:reqUploadUrl')
+AddEventHandler('fivemimagehost:reqUploadUrl', function()
+    local source = source
+    TriggerClientEvent('fivemimagehost:uploadUrl', source, Config.ServerHost)
+end)
+
+exports('getUploadServer', function()
+    return Config.ServerHost
+end)
 
 local function fileExists(path)
     local file = io.open(path, "r")
@@ -44,7 +53,7 @@ SetHttpHandler(function(request, response)
                 repeat
                     imageID = generateID()
                     imageName = imageID..getExtension(content_type)
-                    imagePath = imageDirectory..imageName
+                    imagePath = Config.ImageDirectory..imageName
                 until not fileExists(imagePath)
 
                 local boundary = request.headers['Content-Type']:match('boundary=(.*)')
@@ -75,8 +84,8 @@ SetHttpHandler(function(request, response)
         end)
     elseif request.method == 'GET' and request.path:match("^/images/%w+%.([png|jpg|webp]+)$") then
         local imageID = request.path:match("^/images/(%w+)%.([png|jpg|webp]+)$")
-        local imageName = imageID .. "." .. request.path:match("%.([png|jpg|webp]+)$")
-        local imagePath = imageDirectory .. imageName
+        local imageName = imageID..".".. request.path:match("%.([png|jpg|webp]+)$")
+        local imagePath = Config.ImageDirectory..imageName
         if fileExists(imagePath) then
             local file = io.open(imagePath, "rb")
             local imageData = file:read("*all")
