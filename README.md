@@ -19,7 +19,7 @@
 > ```Config.ImageDirectory = "resources/[utils]/"..GetCurrentResourceName().."/images/"```
 
 > [!NOTE]
-> The resource support webp/png/jpg images, use 
+> The resource support webp/png/jpg images, use webp for faster loading, less media storage and higher image quality
 
 ## Config File
 ```
