@@ -1,13 +1,32 @@
---print(GetResourcePath(GetCurrentResourceName()))
+local cfxReDomain = ""
+local svHost = nil
+
+Citizen.CreateThread(function()
+    if(Config.UseCFXReDomain)then
+        while cfxReDomain == "" do
+            Citizen.Wait(10)
+            cfxReDomain = GetConvar("web_baseUrl", "")
+        end
+        svHost = "https://"..cfxReDomain.."/"..GetCurrentResourceName()
+    else
+        svHost = Config.ServerHost
+    end
+end)
 
 RegisterServerEvent('fivemimagehost:reqUploadUrl')
 AddEventHandler('fivemimagehost:reqUploadUrl', function()
     local source = source
-    TriggerClientEvent('fivemimagehost:uploadUrl', source, Config.ServerHost)
+    while svHost == nil do
+        Wait(10)
+    end
+    TriggerClientEvent('fivemimagehost:uploadUrl', source, svHost)
 end)
 
 exports('getUploadServer', function()
-    return Config.ServerHost
+    while svHost == nil do
+        Wait(10)
+    end
+    return svHost..'/upload'
 end)
 
 local function fileExists(path)
@@ -74,7 +93,7 @@ SetHttpHandler(function(request, response)
                 imageFile:write(image_data)
                 imageFile:close()
                     
-                local url = Config.ServerHost.."/images/" .. imageName
+                local url = svHost.."/images/" .. imageName
                 response.writeHead(200, { ['Content-Type'] = 'application/json' })
                 response.send(json.encode({ id = imageID, attachments = {{proxy_url = url}}, url = url }))
             else
