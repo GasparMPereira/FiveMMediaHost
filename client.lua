@@ -1,12 +1,18 @@
-AddEventHandler('playerSpawned', function()
+local svHost = nil
+
+Citizen.CreateThread(function()
+    Citizen.Wait(10)
     TriggerServerEvent('fivemimagehost:reqUploadUrl')
 end)
 
 RegisterNetEvent('fivemimagehost:uploadUrl')
 AddEventHandler('fivemimagehost:uploadUrl', function(url)
-    Config.ServerHost = url
+    svHost = url
 end)
 
 exports('getUploadServer', function()
-    return Config.ServerHost
+    while svHost == nil do
+        Wait(10)
+    end
+    return svHost..'/upload'
 end)
