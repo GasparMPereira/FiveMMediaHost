@@ -49,6 +49,15 @@ end)
 local newPicture = Citizen.Await(found)
 ```
 
+## How to pass the url server for an resource that needs it in text format
+
+1. Check your CFX.re domain in server console
+
+![cfx_re_domain](https://github.com/GasparMPereira/FiveMImageHost/assets/71574610/e40eacfa-680c-4e6e-a3fa-e4759bae2025)
+
+2. Copy and paste it in your script as ```https://your_cfx_re_domain/FiveMImageHost/upload```
+3. Then you can get the images making a request to ```https://your_cfx_re_domain/FiveMImageHost/images/your_image_id.extension```
+
 # Legal
 
 > [!TIP]
