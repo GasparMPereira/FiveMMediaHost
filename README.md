@@ -1,5 +1,5 @@
-<h1 align='center'><strong>FiveMImageHost</strong></h1>
-<div align='center'><a href='https://discord.gg/4GV6a335ae/'>Discord</a><br><br><p><b>This resource for FiveM Servers allows you to host images in your server, without uploading any file to third party websites</b></p></div>
+<h1 align='center'><strong>FiveMMediaHost</strong></h1>
+<div align='center'><a href='https://discord.gg/4GV6a335ae/'>Discord</a><br><br><p><b>This resource for FiveM Servers allows you to host media files in your server, without uploading any file to third party websites</b></p></div>
 
 ## How to configure
   1. Paste the FiveMImageHost in your resources/ folder
