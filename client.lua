@@ -2,11 +2,11 @@ local svHost = nil
 
 Citizen.CreateThread(function()
     Citizen.Wait(10)
-    TriggerServerEvent('fivemimagehost:reqUploadUrl')
+    TriggerServerEvent('fivemmediahost:reqUploadUrl')
 end)
 
-RegisterNetEvent('fivemimagehost:uploadUrl')
-AddEventHandler('fivemimagehost:uploadUrl', function(url)
+RegisterNetEvent('fivemmediahost:uploadUrl')
+AddEventHandler('fivemmediahost:uploadUrl', function(url)
     svHost = url
 end)
 
