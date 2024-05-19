@@ -59,12 +59,12 @@ local uploadedImageUrl = Citizen.Await(imageUploadPromise)
 ### How to Upload Audio
 
 In this repository I created, you can test how to send audio to the script:
-https://github.com/GasparMPereira/HTML-Microphone-Recorder
+<https://github.com/GasparMPereira/HTML-Microphone-Recorder>
 
 ### How to Upload Video
 
 In this repository I created, you can test how to send video to the script:
-https://github.com/GasparMPereira/HTML-Camera-Recorder
+<https://github.com/GasparMPereira/HTML-Camera-Recorder>
 
 ### How to pass the server's URL to a resource that needs it in text format
 
