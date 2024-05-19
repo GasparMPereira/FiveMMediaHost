@@ -48,85 +48,125 @@ local function generateID()
     return id
 end
 
-local function getExtension(content_type)
-    if content_type == "image/png" then
-        return ".png"
-    elseif content_type == "image/jpeg" then
-        return ".jpg"
-    elseif content_type == "image/webp" then
-        return ".webp"
-    else
-        return ".jpg"
+local function getExtensionAndFolder(contentType)
+    local res = {ext = 'unsupported', folder = ''}
+    if contentType == "image/png" then
+        res = {ext = '.png', folder = Config.ImageDirectory}
+    elseif contentType == "image/jpeg" then
+        res = {ext = '.jpg', folder = Config.ImageDirectory}
+    elseif contentType == "image/webp" then
+        res = {ext = '.webp', folder = Config.ImageDirectory}
+    elseif contentType == "audio/mpeg" then
+        res = {ext = '.mp3', folder = Config.SoundDirectory}
+    elseif contentType == "audio/ogg" then
+        res = {ext = '.ogg', folder = Config.SoundDirectory}
+    elseif contentType == "audio/webm" then
+        res = {ext = '.audio.webm', folder = Config.SoundDirectory}
+    elseif contentType == "video/mp4" then
+        res = {ext = '.mp4', folder = Config.VideoDirectory}
+    elseif contentType == "video/webm" then
+        res = {ext = '.video.webm', folder = Config.VideoDirectory}
     end
+    return res
+end
+
+local function getContentTypeAndFolder(reqPath)
+    local res = {type = 'unsupported', folder = ''}
+    if reqPath:match("%.png$") then
+        res = {type = 'image/png', folder = Config.ImageDirectory}
+    elseif reqPath:match("%.jpg$") then
+        res = {type = 'image/jpeg', folder = Config.ImageDirectory}
+    elseif reqPath:match("%.webp$") then
+        res = {type = 'image/webp', folder = Config.ImageDirectory}
+    elseif reqPath:match("%.mp3$") then
+        res = {type = 'audio/mpeg', folder = Config.SoundDirectory}
+    elseif reqPath:match("%.ogg$") then
+        res = {type = 'audio/ogg', folder = Config.SoundDirectory}
+    elseif reqPath:match("%.audio%.webm$") then
+        res = {type = 'audio/webm', folder = Config.SoundDirectory}
+    elseif reqPath:match("%.video%.webm$") then
+        res = {type = 'video/webm', folder = Config.VideoDirectory}
+    elseif reqPath:match("%.mp4$") then
+        res = {type = 'video/mp4', folder = Config.VideoDirectory}
+    end
+    return res
 end
 
 SetHttpHandler(function(request, response)
+    print(request.method, request.path)
     if request.method == 'POST' and request.path == '/upload' then
         request.setDataHandler(function(body)
             if(body)then
-                local imageID
-                local imageName
-                local imagePath
-                local content_type = (body:match("Content%-Type:%s*(.-)\n") or ""):gsub("^%s*(.-)%s*$", "%1")
+                local mediaID
+                local mediaName
+                local mediaPath
+                local contentType = (body:match("Content%-Type:%s*(.-)\n") or ""):gsub("^%s*(.-)%s*$", "%1")
+
+                local info = getExtensionAndFolder(contentType)
+                if info.ext == 'unsupported' then
+                    response.writeHead(400, { ['Content-Type'] = 'application/json' })
+                    response.send(json.encode({ error = '400', description = 'Unsupported media type' }))
+                    return
+                end
 
                 repeat
-                    imageID = generateID()
-                    imageName = imageID..getExtension(content_type)
-                    imagePath = Config.ImageDirectory..imageName
-                until not fileExists(imagePath)
+                    mediaID = generateID()
+                    mediaName = mediaID..info.ext
+                    mediaPath = info.folder..mediaName
+                until not fileExists(mediaPath)
 
                 local boundary = request.headers['Content-Type']:match('boundary=(.*)')
 
-                local start_index, end_index = string.find(body, boundary, 1, true)
-                if not start_index or not end_index then
-                    return false
+                local startIndex, endIndex = string.find(body, boundary, 1, true)
+                if not startIndex or not endIndex then
+                    response.writeHead(400, { ['Content-Type'] = 'application/json' })
+                    response.send(json.encode({ error = '400', description = 'Invalid multipart data' }))
+                    return
                 end
-                -- Encontra o início do corpo da imagem
-                local image_start_index = string.find(body, "\r\n\r\n", end_index + 1, true)
-                if not image_start_index then
-                    return false
+                -- Encontra o início do corpo do ficheiro
+                local mediaStartIndex = string.find(body, "\r\n\r\n", endIndex + 1, true)
+                if not mediaStartIndex then
+                    response.writeHead(400, { ['Content-Type'] = 'application/json' })
+                    response.send(json.encode({ error = '400', description = 'Invalid multipart data' }))
+                    return
                 end
-                -- Escreve o corpo da imagem num arquivo
-                local image_data = string.sub(body, image_start_index + 4)
+                -- Escreve o corpo da media num ficheiro
+                local mediaData = string.sub(body, mediaStartIndex + 4)
 
-                local imageFile = io.open(imagePath, 'wb')
-                imageFile:write(image_data)
-                imageFile:close()
+                local mediaFile = io.open(mediaPath, 'wb')
+                mediaFile:write(mediaData)
+                mediaFile:close()
                     
-                local url = svHost.."/images/" .. imageName
+                local url = svHost.."/"..Config.MediaEndpoint.."/" .. mediaName
                 response.writeHead(200, { ['Content-Type'] = 'application/json' })
-                response.send(json.encode({ id = imageID, attachments = {{proxy_url = url}}, url = url }))
+                response.send(json.encode({ id = mediaID, attachments = {{proxy_url = url}}, url = url }))
             else
-                response.writeHead(400, { ['Content-Type'] = 'text/plain' })
-                response.send("No images uploaded")
+                response.writeHead(400, { ['Content-Type'] = 'application/json' })
+                response.send(json.encode({ error = '400', description = 'No media uploaded' }))
             end
         end)
-    elseif request.method == 'GET' and request.path:match("^/images/%w+%.([png|jpg|webp]+)$") then
-        local imageID = request.path:match("^/images/(%w+)%.([png|jpg|webp]+)$")
-        local imageName = imageID..".".. request.path:match("%.([png|jpg|webp]+)$")
-        local imagePath = Config.ImageDirectory..imageName
-        if fileExists(imagePath) then
-            local file = io.open(imagePath, "rb")
-            local imageData = file:read("*all")
-            file:close()
-
-            local contentType = ''
-            if request.path:match("%.png$") then
-                contentType = 'image/png'
-            elseif request.path:match("%.jpg$") then
-                contentType = 'image/jpeg'
-            elseif request.path:match("%.webp$") then
-                contentType = 'image/webp'
+    elseif request.method == 'GET' and request.path:match("^/"..Config.MediaEndpoint.."/%w+%.([png|jpg|webp|mp3|ogg|audio%.webm|video%.webm|mp4]+)$") then
+        local info = getContentTypeAndFolder(request.path)
+        if(info.type ~= 'unsupported')then
+            local mediaID = request.path:match("^/"..Config.MediaEndpoint.."/(%w+)%.([png|jpg|webp|mp3|ogg|audio%.webm|video%.webm|mp4]+)$")
+            local mediaName = mediaID..".".. request.path:match("%.([png|jpg|webp|mp3|ogg|audio%.webm|video%.webm|mp4]+)$")
+            local mediaPath = info.folder..mediaName
+            if fileExists(mediaPath) then
+                local file = io.open(mediaPath, "rb")
+                local imageData = file:read("*all")
+                file:close()
+                response.writeHead(200, { ['Content-Type'] = info.type })
+                response.send(imageData)
+            else
+                response.writeHead(404, { ['Content-Type'] = 'application/json' })
+                response.send(json.encode({ error = '400', description = 'Media file not found' }))
             end
-
-            response.writeHead(200, { ['Content-Type'] = contentType })
-            response.send(imageData)
         else
-            response.writeHead(404, { ['Content-Type'] = 'text/plain' })
-            response.send("Image not found")
+            response.writeHead(404, { ['Content-Type'] = 'application/json' })
+            response.send(json.encode({ error = '400', description = 'Media file not found' }))
         end
     else
-        response.writeHead(404, { ['Content-Type'] = 'text/plain' })
-        response.send("Endpoint not found")
+        response.writeHead(404, { ['Content-Type'] = 'application/json' })
+        response.send(json.encode({ error = '400', description = 'Endpoint not found' }))
     end
 end)
