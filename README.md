@@ -15,11 +15,11 @@
 
 > [!NOTE]
 > This resource currently supports:
-> 
-> - Images (webp/png/jpg) 
+>
+> - Images (webp/png/jpg)
 > - Audio (ogg/mp3/webm)
 > - Video (mp4/webm)
-> 
+>
 > Note: Use _webp_ and _webm_ for faster loading and smaller files.
 
 ## Configuration Settings
