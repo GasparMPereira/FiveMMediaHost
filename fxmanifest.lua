@@ -1,8 +1,8 @@
 fx_version 'adamant'
 game 'gta5'
 author 'Gaspar Pereira - Discord: gasparmpereira'
-description 'Image Hosting Resource'
-version '1.0.0'
+description 'Media Hosting Resource'
+version '1.0.1'
 
 shared_scripts{
     'config.lua'
