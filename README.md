@@ -73,7 +73,8 @@ https://github.com/GasparMPereira/HTML-Camera-Recorder
 2. Paste it in your script as `https://your_cfx_re_domain/FiveMMediaHost/upload`
 3. You can then get the images like so: `https://your_cfx_re_domain/FiveMMediaHost/media/your_media_file_id.extension`
 
-## Contributions
+## Contributing
+
 Please submit an _Issue_, if you have any suggestions/bugs. And also a _Pull Request_ if you would like to contribute with some code.
 All help is welcome!
 
