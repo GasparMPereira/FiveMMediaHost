@@ -93,7 +93,6 @@ local function getContentTypeAndFolder(reqPath)
 end
 
 SetHttpHandler(function(request, response)
-    print(request.method, request.path)
     if request.method == 'POST' and request.path == '/upload' then
         request.setDataHandler(function(body)
             if(body)then
