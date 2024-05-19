@@ -13,13 +13,13 @@ Citizen.CreateThread(function()
     end
 end)
 
-RegisterServerEvent('fivemimagehost:reqUploadUrl')
-AddEventHandler('fivemimagehost:reqUploadUrl', function()
+RegisterServerEvent('fivemmediahost:reqUploadUrl')
+AddEventHandler('fivemmediahost:reqUploadUrl', function()
     local source = source
     while svHost == nil do
         Wait(10)
     end
-    TriggerClientEvent('fivemimagehost:uploadUrl', source, svHost)
+    TriggerClientEvent('fivemmediahost:uploadUrl', source, svHost)
 end)
 
 exports('getUploadServer', function()
